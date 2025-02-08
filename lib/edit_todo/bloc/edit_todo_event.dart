@@ -28,3 +28,7 @@ final class EditTodoDescriptionChanged extends EditTodoEvent {
 final class EditTodoSubmitted extends EditTodoEvent {
   const EditTodoSubmitted();
 }
+
+final class EditTodoDeleted extends EditTodoEvent {
+  const EditTodoDeleted();
+}

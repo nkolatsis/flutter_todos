@@ -34,6 +34,7 @@ class EditTodoPage extends StatelessWidget {
   }
 }
 
+// @disable
 class EditTodoView extends StatelessWidget {
   const EditTodoView({super.key});
 
@@ -52,6 +53,17 @@ class EditTodoView extends StatelessWidget {
               ? l10n.editTodoAddAppBarTitle
               : l10n.editTodoEditAppBarTitle,
         ),
+        // If todo is already created, show delete button in trailing field
+        actions: isNewTodo
+            ? []
+            : [
+                IconButton(
+                  onPressed: () => {
+                    context.read<EditTodoBloc>().add(const EditTodoDeleted()),
+                  },
+                  icon: Icon(Icons.delete),
+                ),
+              ],
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: l10n.editTodoSaveButtonTooltip,

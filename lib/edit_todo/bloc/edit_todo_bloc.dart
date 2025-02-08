@@ -20,6 +20,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     on<EditTodoTitleChanged>(_onTitleChanged);
     on<EditTodoDescriptionChanged>(_onDescriptionChanged);
     on<EditTodoSubmitted>(_onSubmitted);
+    on<EditTodoDeleted>(_onDeleted);
   }
 
   final TodosRepository _todosRepository;
@@ -50,6 +51,20 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
 
     try {
       await _todosRepository.saveTodo(todo);
+      emit(state.copyWith(status: EditTodoStatus.success));
+    } catch (e) {
+      emit(state.copyWith(status: EditTodoStatus.failure));
+    }
+  }
+
+  Future<void> _onDeleted(
+    EditTodoDeleted event,
+    Emitter<EditTodoState> emit,
+  ) async {
+    final todo = state.initialTodo;
+    emit(state.copyWith(status: EditTodoStatus.loading));
+    try {
+      await _todosRepository.deleteTodo(todo!.id);
       emit(state.copyWith(status: EditTodoStatus.success));
     } catch (e) {
       emit(state.copyWith(status: EditTodoStatus.failure));
