@@ -28,7 +28,7 @@ class AppView extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: FlutterTodosTheme.light,
       darkTheme: FlutterTodosTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const HomePage(),
