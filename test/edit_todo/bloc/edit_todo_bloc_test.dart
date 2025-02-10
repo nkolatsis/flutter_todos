@@ -27,6 +27,17 @@ void main() {
       );
     }
 
+    EditTodoBloc buildBlocWithInitialTodo() {
+      return EditTodoBloc(
+        todosRepository: todosRepository,
+        initialTodo: Todo(
+          id: 'initial-id',
+          title: 'title',
+          description: 'description',
+        ),
+      );
+    }
+
     group('constructor', () {
       test('works properly', () {
         expect(buildBloc, returnsNormally);
@@ -55,8 +66,7 @@ void main() {
       blocTest<EditTodoBloc, EditTodoState>(
         'emits new state with updated description',
         build: buildBloc,
-        act: (bloc) =>
-            bloc.add(const EditTodoDescriptionChanged('newdescription')),
+        act: (bloc) => bloc.add(const EditTodoDescriptionChanged('newdescription')),
         expect: () => const [
           EditTodoState(description: 'newdescription'),
         ],
@@ -92,9 +102,7 @@ void main() {
           verify(
             () => todosRepository.saveTodo(
               any(
-                that: isA<Todo>()
-                    .having((t) => t.title, 'title', equals('title'))
-                    .having(
+                that: isA<Todo>().having((t) => t.title, 'title', equals('title')).having(
                       (t) => t.description,
                       'description',
                       equals('description'),
@@ -162,8 +170,7 @@ void main() {
       blocTest<EditTodoBloc, EditTodoState>(
         'emits new state with error if save to repository fails',
         build: () {
-          when(() => todosRepository.saveTodo(any()))
-              .thenThrow(Exception('oops'));
+          when(() => todosRepository.saveTodo(any())).thenThrow(Exception('oops'));
           return buildBloc();
         },
         seed: () => const EditTodoState(
@@ -185,5 +192,82 @@ void main() {
         ],
       );
     });
+
+    group(
+      'EditTodoDeleted',
+      () {
+        blocTest<EditTodoBloc, EditTodoState>(
+          'triggers deletion of the todo',
+          build: buildBlocWithInitialTodo,
+          act: (bloc) => bloc.add(const EditTodoDeleted()),
+          verify: (bloc) {
+            verify(() => todosRepository.deleteTodo('initial-id')).called(1);
+          },
+        );
+
+        blocTest<EditTodoBloc, EditTodoState>(
+          'emits new state with deleted status when deletion is successful',
+          build: buildBlocWithInitialTodo,
+          setUp: () {
+            when(() => todosRepository.deleteTodo(any())).thenAnswer((_) async {});
+          },
+          act: (bloc) => bloc.add(const EditTodoDeleted()),
+          expect: () => [
+            EditTodoState(
+              status: EditTodoStatus.loading,
+              initialTodo: Todo(
+                id: 'initial-id',
+                title: 'title',
+                description: 'description',
+              ),
+              title: 'title',
+              description: 'description',
+            ),
+            EditTodoState(
+              status: EditTodoStatus.deleted,
+              initialTodo: Todo(
+                id: 'initial-id',
+                title: 'title',
+                description: 'description',
+              ),
+              title: 'title',
+              description: 'description',
+            ),
+          ],
+        );
+
+        blocTest<EditTodoBloc, EditTodoState>(
+          'emits new state with failure status when deletion fails',
+          build: buildBlocWithInitialTodo,
+          setUp: () {
+            when(() => todosRepository.deleteTodo(any())).thenThrow(Exception('oops'));
+            return buildBloc();
+          },
+          act: (bloc) => bloc.add(const EditTodoDeleted()),
+          expect: () => [
+            EditTodoState(
+              status: EditTodoStatus.loading,
+              initialTodo: Todo(
+                id: 'initial-id',
+                title: 'title',
+                description: 'description',
+              ),
+              title: 'title',
+              description: 'description',
+            ),
+            EditTodoState(
+              status: EditTodoStatus.failure,
+              initialTodo: Todo(
+                id: 'initial-id',
+                title: 'title',
+                description: 'description',
+              ),
+              title: 'title',
+              description: 'description',
+            ),
+          ],
+        );
+      },
+    );
   });
 }

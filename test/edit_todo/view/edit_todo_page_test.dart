@@ -246,5 +246,29 @@ void main() {
         },
       );
     });
+
+    group('delete button', () {
+      testWidgets('is rendered', (tester) async {
+        await tester.pumpApp(buildSubject());
+        expect(
+          find.descendant(
+            of: find.byType(IconButton),
+            matching: find.byIcon(Icons.delete),
+          ),
+          findsOneWidget,
+        );
+      });
+      testWidgets(
+        'adds EditTodoDeleted '
+        'to EditTodoBloc '
+        'when tapped',
+        (tester) async {
+          await tester.pumpApp(buildSubject());
+          await tester.tap(find.byIcon(Icons.delete));
+
+          verify(() => editTodoBloc.add(const EditTodoDeleted())).called(1);
+        },
+      );
+    });
   });
 }

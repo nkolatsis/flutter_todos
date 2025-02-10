@@ -56,5 +56,21 @@ void main() {
         );
       });
     });
+
+    group('EditTodoDeleted', () {
+      test('supports value equality', () {
+        expect(
+          EditTodoDeleted(),
+          equals(EditTodoDeleted()),
+        );
+      });
+
+      test('props are correct', () {
+        expect(
+          EditTodoDeleted().props,
+          equals(<Object?>[]),
+        );
+      });
+    });
   });
 }

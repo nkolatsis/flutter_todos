@@ -65,7 +65,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     emit(state.copyWith(status: EditTodoStatus.loading));
     try {
       await _todosRepository.deleteTodo(todo!.id);
-      emit(state.copyWith(status: EditTodoStatus.success));
+      emit(state.copyWith(status: EditTodoStatus.deleted));
     } catch (e) {
       emit(state.copyWith(status: EditTodoStatus.failure));
     }
